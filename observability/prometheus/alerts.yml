@@ -1,0 +1,47 @@
+groups:
+  - name: engtrace-api
+    rules:
+      - alert: EngTraceApiUnavailable
+        expr: up{job="engtrace-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: EngTrace API is unavailable
+          description: Prometheus has been unable to scrape the EngTrace API for two minutes.
+
+      - alert: EngTraceHighErrorRate
+        expr: |
+          (
+            sum(rate(engtrace_http_requests_total{status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(engtrace_http_requests_total[5m])), 0.001)
+          ) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: EngTrace API 5xx rate exceeds 5%
+          description: More than 5% of API requests have failed for ten minutes.
+
+      - alert: EngTraceHighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(engtrace_http_request_duration_seconds_bucket[5m]))
+          ) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: EngTrace API p95 latency exceeds two seconds
+          description: The API latency objective has been missed for ten minutes.
+
+      - alert: EngTraceRepeatedGuardrailBlocks
+        expr: sum(increase(engtrace_answers_total{blocked="true"}[10m])) > 5
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: Repeated guarded-answer blocks detected
+          description: More than five answer requests were blocked in ten minutes; inspect for prompt-injection attempts.

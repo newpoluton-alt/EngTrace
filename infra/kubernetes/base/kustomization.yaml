@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: engtrace
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - serviceaccounts.yaml
+  - api.yaml
+  - worker.yaml
+  - web.yaml
+  - ingress.yaml
+  - availability.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: engtrace
+      app.kubernetes.io/managed-by: kustomize
+    includeSelectors: false

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engtrace-worker
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: engtrace-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: engtrace-worker
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: engtrace-api
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: worker
+          image: ghcr.io/engtrace/engtrace-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - dramatiq
+            - engtrace_worker.tasks
+            - --processes
+            - "2"
+            - --threads
+            - "4"
+          envFrom:
+            - configMapRef:
+                name: engtrace-config
+            - secretRef:
+                name: engtrace-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi

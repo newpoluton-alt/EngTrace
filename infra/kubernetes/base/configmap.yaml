@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: engtrace-config
+data:
+  ENGTRACE_ENV: production
+  ENGTRACE_API_PREFIX: /api/v1
+  ENGTRACE_CORS_ORIGINS: '["https://engtrace.example.com"]'
+  ENGTRACE_S3_ENDPOINT: https://s3.amazonaws.com
+  ENGTRACE_S3_BUCKET: engtrace-production-evidence
+  ENGTRACE_MODEL_BASE_URL: http://vllm.engtrace-models.svc.cluster.local:8000/v1
+  ENGTRACE_MODEL_NAME: Qwen/Qwen3-8B
+  ENGTRACE_OTEL_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
+  OTEL_SERVICE_NAME: engtrace-api
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production,service.version=0.1.0
