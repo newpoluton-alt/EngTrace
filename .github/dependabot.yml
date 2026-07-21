@@ -15,6 +15,16 @@ updates:
     groups:
       web-runtime:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # These majors are intentionally held at the compatibility boundary documented in
+      # docs/STACK.md: Node 24 types, ESLint 9 plugin peers, and TypeScript 6 compiler APIs.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

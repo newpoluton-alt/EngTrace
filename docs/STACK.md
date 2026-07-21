@@ -44,6 +44,9 @@ uses AWS S3), with object versioning and optional
   never installed in the API image. Its Python package currently constrains FastAPI below 0.137,
   while EngTrace uses 0.139, so a separate OpenAI-compatible service is also the clean dependency
   boundary—not just a scaling choice.
+- ESLint 10 and TypeScript 7 are newer, but the Next.js 16.2 lint plugin graph still declares
+  ESLint 9 peer ranges and typescript-eslint 8.65 supports TypeScript below 6.1. EngTrace therefore
+  pins ESLint 9.39 and TypeScript 6.0 until those compatibility boundaries move.
 - Redis is coordination/cache, not authority. PostgreSQL owns trace, approval and audit state.
 - Terraform after 1.5 is BUSL-licensed. That does not change this repository's Apache-2.0 license;
   teams requiring OSI-licensed infrastructure tooling should evaluate OpenTofu explicitly.
